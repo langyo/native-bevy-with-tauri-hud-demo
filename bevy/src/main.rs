@@ -1,5 +1,5 @@
 use bevy::{prelude::*, winit::WinitWindows};
-use winit::raw_window_handle::{HasWindowHandle as _, RawWindowHandle};
+use raw_window_handle::HasWindowHandle as _;
 
 fn main() {
     App::new()
@@ -46,8 +46,16 @@ fn setup(
     let window = winit_windows.windows.iter().next().unwrap().1;
     let handle = window.window_handle().unwrap().as_raw();
     match handle {
-        RawWindowHandle::Win32(handle) => {
-            println!("HWND: 0x{:08x}", handle.hwnd);
+        raw_window_handle::RawWindowHandle::Win32(handle) => {
+            let hwnd: isize = handle.hwnd.into();
+            println!("HWND: 0x{:08x}", hwnd);
+
+            std::thread::spawn(move || {
+                std::process::Command::new("./target/debug/_tauri.exe")
+                    .arg(hwnd.to_string())
+                    .spawn()
+                    .expect("failed to execute process");
+            });
         }
         _ => {
             println!("Not a Win32 window");

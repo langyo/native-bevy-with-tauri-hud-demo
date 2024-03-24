@@ -8,7 +8,7 @@ version = "0.1.0"
 
 [tauri]
 windows = [
-  { label = "entry", width = 400, height = 300, decorations = false, transparent = true, center = true },
+  { label = "entry", width = 400, height = 300, decorations = false, transparent = true },
 ]
 
 [tauri.allowlist]

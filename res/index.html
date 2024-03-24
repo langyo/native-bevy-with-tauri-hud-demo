@@ -1,1 +1,31 @@
-<h1 style="color: blue;">Test</h1>
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: transparent;
+            overflow: hidden;
+        }
+    </style>
+
+    <h1 style="color: #6cf;">0s</h1>
+
+    <script>
+        let i = 0;
+        setInterval(() => {
+            i += 1;
+            document.querySelector('h1').innerText = i;
+        }, 1000);
+    </script>
+</body>
