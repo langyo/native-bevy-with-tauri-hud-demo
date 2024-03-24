@@ -7,3 +7,4 @@ edition.workspace = true
 
 [dependencies]
 bevy = { version = "^0.13" }
+winit = { version = "^0.29" }
