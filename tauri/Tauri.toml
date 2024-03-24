@@ -1,0 +1,17 @@
+[build]
+distDir = "../res"
+withGlobalTauri = true
+
+[package]
+productName = "rivagan-watermark"
+version = "0.1.0"
+
+[tauri]
+windows = [
+  { label = "entry", width = 400, height = 300, decorations = false, transparent = true, center = true },
+]
+
+[tauri.allowlist]
+all = false
+shell = { all = false, open = true }
+window = { all = true }

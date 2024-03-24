@@ -1,0 +1,9 @@
+[package]
+name = "_bevy"
+authors.workspace = true
+publish.workspace = true
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+bevy = { version = "^0.13" }
