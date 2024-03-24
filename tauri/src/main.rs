@@ -7,6 +7,8 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+use raw_window_handle::HasRawWindowHandle;
+
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
@@ -14,6 +16,16 @@ fn main() {
 
             let window = app.get_window("entry").unwrap();
             window_shadows::set_shadow(&window, true).expect("Unsupported platform!");
+
+            match window.raw_window_handle() {
+                raw_window_handle::RawWindowHandle::Win32(handle) => {
+                    println!("HWND: 0x{:08x}", handle.hwnd as usize);
+                }
+                _ => {
+                    println!("Not a Win32 window");
+                }
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet])

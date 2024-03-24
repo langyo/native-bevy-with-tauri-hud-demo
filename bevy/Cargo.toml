@@ -7,4 +7,4 @@ edition.workspace = true
 
 [dependencies]
 bevy = { version = "^0.13" }
-winit = { version = "^0.29" }
+raw-window-handle = { version = "^0.6" }
