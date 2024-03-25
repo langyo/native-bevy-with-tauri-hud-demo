@@ -12,8 +12,8 @@ use windows::Win32::{
     Foundation::{COLORREF, HWND},
     UI::WindowsAndMessaging::{
         SetLayeredWindowAttributes, SetParent, SetWindowLongPtrA, SetWindowPos, GWL_EXSTYLE,
-        GWL_STYLE, LWA_ALPHA, SWP_NOSIZE, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOPMOST, WS_POPUP,
-        WS_VISIBLE,
+        GWL_STYLE, LWA_ALPHA, SWP_NOSIZE, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOPMOST,
+        WS_EX_TRANSPARENT, WS_POPUP, WS_VISIBLE,
     },
 };
 
@@ -41,7 +41,10 @@ fn main() {
 
                             let style = WS_POPUP.0 | WS_VISIBLE.0;
                             SetWindowLongPtrA(tauri_hwnd, GWL_STYLE, style as isize);
-                            let style = WS_EX_LAYERED.0 | WS_EX_NOACTIVATE.0 | WS_EX_TOPMOST.0;
+                            let style = WS_EX_LAYERED.0
+                                | WS_EX_NOACTIVATE.0
+                                | WS_EX_TOPMOST.0
+                                | WS_EX_TRANSPARENT.0;
                             SetWindowLongPtrA(tauri_hwnd, GWL_EXSTYLE, style as isize);
 
                             // TODO - 虽然嵌入成功了，但是透明度设置失败了

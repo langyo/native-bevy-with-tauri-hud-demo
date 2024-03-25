@@ -1,11 +1,31 @@
+use std::{process::Child, thread::JoinHandle};
+
+use flume::{Receiver, Sender};
+use once_cell::sync::Lazy;
+
 use bevy::{prelude::*, winit::WinitWindows};
 use raw_window_handle::HasWindowHandle as _;
+
+static EXIT_HANDLER: Lazy<(Sender<JoinHandle<Child>>, Receiver<JoinHandle<Child>>)> =
+    Lazy::new(|| {
+        let (tx, rx) = flume::unbounded();
+        (tx, rx)
+    });
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, setup)
         .run();
+
+    EXIT_HANDLER
+        .1
+        .recv()
+        .unwrap()
+        .join()
+        .unwrap()
+        .kill()
+        .unwrap();
 }
 
 fn setup(
@@ -50,12 +70,13 @@ fn setup(
             let hwnd: isize = handle.hwnd.into();
             println!("HWND: 0x{:08x}", hwnd);
 
-            std::thread::spawn(move || {
+            let handle = std::thread::spawn(move || {
                 std::process::Command::new("./target/debug/_tauri.exe")
                     .arg(hwnd.to_string())
                     .spawn()
-                    .expect("failed to execute process");
+                    .expect("failed to execute process")
             });
+            EXIT_HANDLER.0.send(handle).unwrap();
         }
         _ => {
             println!("Not a Win32 window");
