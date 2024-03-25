@@ -10,6 +10,7 @@ dependencies = [
  "flume",
  "once_cell",
  "raw-window-handle 0.6.0",
+ "windows 0.54.0",
 ]
 
 [[package]]

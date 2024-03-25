@@ -1,7 +1,5 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -9,12 +7,9 @@ fn greet(name: &str) -> String {
 
 use raw_window_handle::HasRawWindowHandle;
 use windows::Win32::{
-    Foundation::{COLORREF, HWND},
-    UI::WindowsAndMessaging::{
-        SetLayeredWindowAttributes, SetParent, SetWindowLongPtrA, SetWindowPos, GWL_EXSTYLE,
-        GWL_STYLE, LWA_ALPHA, SWP_NOSIZE, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOPMOST,
-        WS_EX_TRANSPARENT, WS_POPUP, WS_VISIBLE,
-    },
+    Foundation::{HWND, POINT, RECT},
+    Graphics::Gdi::ClientToScreen,
+    UI::WindowsAndMessaging::{GetClientRect, SetWindowPos, HWND_TOPMOST, SWP_NOACTIVATE},
 };
 
 fn main() {
@@ -35,21 +30,36 @@ fn main() {
                         let tauri_hwnd = HWND(tauri_hwnd as _);
                         let bevy_hwnd = HWND(bevy_hwnd as _);
 
-                        unsafe {
-                            SetWindowPos(tauri_hwnd, bevy_hwnd, 0, 0, 0, 0, SWP_NOSIZE).unwrap();
-                            SetParent(tauri_hwnd, bevy_hwnd);
+                        loop {
+                            unsafe {
+                                let mut rect: RECT = Default::default();
+                                GetClientRect(bevy_hwnd.clone(), &mut rect).unwrap();
 
-                            let style = WS_POPUP.0 | WS_VISIBLE.0;
-                            SetWindowLongPtrA(tauri_hwnd, GWL_STYLE, style as isize);
-                            let style = WS_EX_LAYERED.0
-                                | WS_EX_NOACTIVATE.0
-                                | WS_EX_TOPMOST.0
-                                | WS_EX_TRANSPARENT.0;
-                            SetWindowLongPtrA(tauri_hwnd, GWL_EXSTYLE, style as isize);
+                                let mut left_top: POINT = POINT {
+                                    x: rect.left,
+                                    y: rect.top,
+                                };
+                                let mut right_bottom: POINT = POINT {
+                                    x: rect.right,
+                                    y: rect.bottom,
+                                };
+                                ClientToScreen(bevy_hwnd, &mut left_top);
+                                ClientToScreen(bevy_hwnd, &mut right_bottom);
 
-                            // TODO - 虽然嵌入成功了，但是透明度设置失败了
-                            SetLayeredWindowAttributes(tauri_hwnd, COLORREF(0), 255, LWA_ALPHA)
+                                let width = rect.right - rect.left;
+                                let height = rect.bottom - rect.top;
+
+                                SetWindowPos(
+                                    tauri_hwnd,
+                                    HWND_TOPMOST,
+                                    left_top.x,
+                                    left_top.y,
+                                    width,
+                                    height,
+                                    SWP_NOACTIVATE,
+                                )
                                 .unwrap();
+                            }
                         }
                     });
                 }

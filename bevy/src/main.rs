@@ -1,4 +1,7 @@
-use std::{process::Child, thread::JoinHandle};
+use std::{
+    process::{Child, Stdio},
+    thread::JoinHandle,
+};
 
 use flume::{Receiver, Sender};
 use once_cell::sync::Lazy;
@@ -73,6 +76,9 @@ fn setup(
             let handle = std::thread::spawn(move || {
                 std::process::Command::new("./target/debug/_tauri.exe")
                     .arg(hwnd.to_string())
+                    .stdin(Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .stderr(Stdio::piped())
                     .spawn()
                     .expect("failed to execute process")
             });
